@@ -4,6 +4,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 import rotation_engine
+import data_backbone
+from pathlib import Path
 
 # Page config
 
@@ -11,6 +13,24 @@ st.set_page_config(
     page_title="InvestEdge – SIP Rotation Lab",
     layout="wide",
 )
+
+def check_and_initialize_data():
+    """
+    Checks if clean data exists. If not, runs the data backbone to fetch/process it.
+    This is crucial for deployment environments where data might not be persisted.
+    """
+    clean_dir = Path("data/clean")
+    # Simple check: if directory doesn't exist or is empty, run data fetch
+    if not clean_dir.exists() or not any(clean_dir.iterdir()):
+        with st.spinner("Initializing data for the first time... This may take a minute."):
+            try:
+                data_backbone.run_phase1_data_backbone()
+                st.success("Data initialized successfully!")
+            except Exception as e:
+                st.error(f"Failed to initialize data: {e}")
+                st.stop()
+
+check_and_initialize_data()
 
 
 CUSTOM_CSS = """
