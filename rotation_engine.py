@@ -482,6 +482,7 @@ def run_rotation_sip_strategy(
                     "trade_date": trade_date,
                     "amount": alloc_for_month[name],
                     "units": units,
+                    "weight": alloc_for_month[name] / sip_amount,
                     "score": scores[name],
                 }
             )

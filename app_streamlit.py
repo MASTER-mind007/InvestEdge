@@ -149,11 +149,17 @@ with st.expander("Strategy Logic", expanded=False):
     st.write(
         """
         1. You pick 2–4 funds (ideally one per category).
-        2. Every month, a fixed SIP amount is invested:
-           - 10% goes to **each** selected fund (diversification floor).
-           - The remaining SIP is allocated using a **score** based on:
-             - Multi-horizon returns (1/3/6 month),
-             - Penalised by 6-month volatility and 6-month max drawdown.
+        2. Every month, a fixed SIP amount is invested.
+        
+        **Strategy 1**:
+        - 10% allocation to each fund.
+        - Remaining allocated based on score (Returns , Volatility , Drawdown).
+        
+        **Strategy 2**:
+        - 50% equal weight core.
+        - 25% trend tilt (Relative Strength).
+        - 25% buy the dip tilt (Drawdown).
+        
         3. Over time, the portfolio tilts more towards funds with stronger, more stable performance,
            while always keeping some allocation in every chosen fund.
         4. We compare this rotation strategy against a classic SIP in one fund using:
