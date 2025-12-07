@@ -640,33 +640,41 @@ def run_rotation_sip_strategy_v2_buy_the_dip(
 
         if scores is not None:
             # Build arrays for strength and dip
-            strength_vals = np.array([scores[name]["strength"] for name in fund_names])
-            dip_vals = np.array([scores[name]["dip_capped"] for name in fund_names])
-
-            # --- Trend tilt: based on relative strength ---
-            s_min = float(np.min(strength_vals))
-            s_max = float(np.max(strength_vals))
-            if s_max - s_min > 1e-8:
-                # Normalise strength to [0,1]
-                strength_norm = (strength_vals - s_min) / (s_max - s_min)
-                # Softmax with mild temperature k=1
-                exp_s = np.exp(strength_norm)
-                trend_w = exp_s / exp_s.sum()
+            # Identify funds with valid scores
+            valid_funds = [n for n in fund_names if n in scores]
+            
+            if not valid_funds:
+                 # Fallback if no funds have valid scores
+                 trend_weights = {name: 1.0 / len(fund_names) for name in fund_names}
+                 dip_weights = {name: 1.0 / len(fund_names) for name in fund_names}
             else:
-                # If all strengths identical, stay equal
-                trend_w = np.ones_like(strength_vals) / N
-
-            # --- Dip tilt: buy dips only if positive trend ---
-            if dip_vals.sum() > 1e-8:
-                dip_w = dip_vals / dip_vals.sum()
-            else:
-                # If no meaningful dips, stay equal
-                dip_w = np.ones_like(dip_vals) / N
-
-            trend_weights = {name: float(w) for name, w in zip(fund_names, trend_w)}
-            dip_weights = {name: float(w) for name, w in zip(fund_names, dip_w)}
-
-        # ---- Convert tilt weights to rupee allocations ----
+                strength_vals = np.array([scores[n]["strength"] for n in valid_funds])
+                dip_vals = np.array([scores[n]["dip_capped"] for n in valid_funds])
+                
+                # --- Trend tilt: based on relative strength ---
+                s_min = float(np.min(strength_vals))
+                s_max = float(np.max(strength_vals))
+                if s_max - s_min > 1e-8:
+                    strength_norm = (strength_vals - s_min) / (s_max - s_min)
+                    exp_s = np.exp(strength_norm)
+                    trend_w = exp_s / exp_s.sum()
+                else:
+                    trend_w = np.ones_like(strength_vals) / len(valid_funds)
+                    
+                # --- Dip tilt: buy dips only if positive trend ---
+                if dip_vals.sum() > 1e-8:
+                    dip_w = dip_vals / dip_vals.sum()
+                else:
+                    dip_w = np.ones_like(dip_vals) / len(valid_funds)
+                    
+                # Map back to full fund list
+                trend_weights = {name: 0.0 for name in fund_names}
+                dip_weights = {name: 0.0 for name in fund_names}
+                
+                for name, w in zip(valid_funds, trend_w):
+                    trend_weights[name] = float(w)
+                for name, w in zip(valid_funds, dip_w):
+                    dip_weights[name] = float(w)
         trend_amt_total = 0.25 * sip_amount
         dip_amt_total = 0.25 * sip_amount
 
