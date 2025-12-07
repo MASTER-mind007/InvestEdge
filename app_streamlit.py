@@ -284,11 +284,11 @@ if run_btn and not run_disabled:
 
             alloc_strategy = st.radio(
                 "Select strategy to view allocation:",
-                ["Rotation v1 (Score based)", "Rotation v2 (Performance + Dip)"],
+                ["Strategy 1", "Strategy 2"],
                 horizontal=True
             )
             
-            if alloc_strategy == "Rotation v1 (Score based)":
+            if alloc_strategy == "Strategy 1":
                 target_res = rotation_res
             else:
                 target_res = rotation_v2_res
