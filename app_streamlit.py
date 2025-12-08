@@ -85,6 +85,15 @@ ALL_FUNDS = [
     "UTI Small Cap Fund - Direct Plan - Growth Option",
     "UTI Flexi Cap Fund - Growth Option - Direct",
     "UTI Multi Asset Allocation Fund - Direct Plan - Growth Option",
+    "HDFC Nifty 50 Index Fund - Direct Plan",
+    "SBI Nifty Index Fund - Direct Plan - Growth",
+    "UTI Nifty 50 Index Fund - Growth Option - Direct",
+    "HDFC Retirement Savings Fund - Equity Plan - Growth Option - Direct Plan",
+    "SBI Retirement Benefit Fund - Aggressive Plan - Direct Plan - Growth",
+    "UTI Retirement Fund - Direct Plan",
+    "HDFC Gold ETF Fund of Fund - Direct Plan",
+    "SBI Gold Fund - Direct Plan - Growth",
+    "UTI Gold ETF Fund of Fund - Direct Plan - Growth Option",
 ]
 
 st.sidebar.title("InvestEdge Lab")
