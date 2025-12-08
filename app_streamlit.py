@@ -43,26 +43,52 @@ CUSTOM_CSS = """
 section[data-testid="stSidebar"] {
     background-color: #020617;
 }
-h1, h2, h3 {
-    font-weight: 600;
+
+/* Sidebar Text & Headers - Force Consistency */
+section[data-testid="stSidebar"] .block-container,
+section[data-testid="stSidebar"] label,
+section[data-testid="stSidebar"] .stMarkdown p {
+    color: #e5e7eb !important;
+    font-family: "Inter", system-ui, -apple-system, sans-serif !important;
 }
+
+/* Fix for Selectbox/Multiselect text visibility */
+/* Ensure input boxes keep their default (usually dark) text or adapt properly */
+section[data-testid="stSidebar"] div[data-baseweb="select"] span {
+    color: #e5e7eb !important; /* Selected value text */
+}
+
+
+
+section[data-testid="stSidebar"] h1,
+section[data-testid="stSidebar"] h2,
+section[data-testid="stSidebar"] h3 {
+    color: #f8fafc !important; /* Brighter white for headers */
+    font-family: "Inter", system-ui, -apple-system, sans-serif !important;
+    font-weight: 700 !important;
+}
+
+/* Metric Cards */
 .metric-card {
     padding: 0.9rem 1.1rem;
     border-radius: 0.9rem;
-    background: #020617;
-    border: 1px solid #1f2937;
-    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.7);
+    background: #1e293b; /* Slightly lighter than bg for contrast */
+    border: 1px solid #334155;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
+
 .stButton > button {
     background-color: #22c55e;
     color: #020617;
     border-radius: 999px;
     border: none;
-    padding: 0.4rem 1.2rem;
-    font-weight: 600;
+    padding: 0.5rem 1.5rem;
+    font-weight: 700;
+    transition: all 0.2s;
 }
 .stButton > button:hover {
     background-color: #16a34a;
+    transform: scale(1.02);
 }
 </style>
 """
@@ -96,7 +122,8 @@ ALL_FUNDS = [
     "UTI Gold ETF Fund of Fund - Direct Plan - Growth Option",
 ]
 
-st.sidebar.title("InvestEdge Lab")
+st.sidebar.markdown("# InvestEdge Lab")
+st.sidebar.markdown("### Select Funds")
 st.sidebar.caption("Configure your rotation experiment")
 
 # ------------- Fund selection -------------
