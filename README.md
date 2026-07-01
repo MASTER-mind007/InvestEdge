@@ -3,13 +3,6 @@
 ## Overview
 InvestEdge is a quantitative backtesting framework designed to analyze and compare Systematic Investment Plan (SIP) strategies. It focuses on evaluating a "Rotation" strategy against traditional baseline SIPs. The system allows users to simulate portfolio performance using historical Net Asset Value (NAV) data, applying dynamic allocation rules based on multi-horizon returns and risk metrics.
 
-## Features
-- **Multi-Strategy Comparison**: Compare "Baseline SIP", "Equal Weight SIP", "Rotation v1 (Score-based)", and "Rotation v2 (Trend + Dip)".
-- **Dynamic Allocation**: Simulate monthly rebalancing based on momentum (R1, R3, R6), volatility (VOL6), and drawdown (DD6) signals.
-- **Interactive Dashboard**: A Streamlit-based UI for configuring backtest parameters (funds, dates, risk penalties) and visualizing results.
-- **Comprehensive Metrics**: Calculate XIRR, Absolute Return, Volatility, Max Drawdown, Sortino Ratio, and Alpha/Beta.
-- **Visualizations**: Interactive charts for Equity Curves, Drawdown Curves, and Monthly Allocation History.
-
 ## Installation
 
 1.  **Clone the repository** (or extract the project files).
