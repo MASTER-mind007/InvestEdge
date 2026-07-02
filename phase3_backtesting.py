@@ -105,6 +105,13 @@ def run_baseline_sip_strategy(
     if df_period.empty:
         raise ValueError("No NAV data in the chosen period for baseline strategy.")
 
+    if frequency in ("M", "ME"):
+        try:
+            pd.date_range(start="2020-01-01", end="2020-01-31", freq="ME")
+            frequency = "ME"
+        except ValueError:
+            frequency = "M"
+
     sip_dates = pd.date_range(start=start_date, end=end_date, freq=frequency).to_pydatetime().tolist()
     sip_records = []
     for d in sip_dates:
@@ -233,6 +240,13 @@ def run_momentum_sip_strategy(
     combined_nav = _load_multi_fund_nav(fund_names, start_date, end_date)
     if combined_nav.empty:
         raise ValueError("No NAV data available for momentum strategy period.")
+
+    if frequency in ("M", "ME"):
+        try:
+            pd.date_range(start="2020-01-01", end="2020-01-31", freq="ME")
+            frequency = "ME"
+        except ValueError:
+            frequency = "M"
 
     sip_dates = pd.date_range(start=start_date, end=end_date, freq=frequency).to_pydatetime().tolist()
 
@@ -383,6 +397,13 @@ def run_rotation_sip_strategy(
         raise ValueError("No NAV data available for rotation strategy period.")
 
     # SIP schedule
+    if frequency in ("M", "ME"):
+        try:
+            pd.date_range(start="2020-01-01", end="2020-01-31", freq="ME")
+            frequency = "ME"
+        except ValueError:
+            frequency = "M"
+
     sip_dates = pd.date_range(start=start_date, end=end_date, freq=frequency).to_pydatetime().tolist()
 
     # Track monthly unit changes for each fund

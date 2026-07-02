@@ -184,6 +184,13 @@ def sip_return(
     if df_period.empty:
         raise ValueError("No NAV data in the SIP period.")
 
+    if frequency in ("M", "ME"):
+        try:
+            pd.date_range(start="2020-01-01", end="2020-01-31", freq="ME")
+            frequency = "ME"
+        except ValueError:
+            frequency = "M"
+
     sip_dates = pd.date_range(start=start_date, end=end_date, freq=frequency)
     sip_dates = sip_dates.to_pydatetime().tolist()
 

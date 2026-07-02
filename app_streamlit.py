@@ -19,7 +19,7 @@ def check_and_initialize_data():
     Checks if clean data exists. If not, runs the data backbone to fetch/process it.
     This is crucial for deployment environments where data might not be persisted.
     """
-    clean_dir = Path("data/clean")
+    clean_dir = Path(__file__).resolve().parent / "data" / "clean"
     # Simple check: if directory doesn't exist or is empty, run data fetch
     if not clean_dir.exists() or not any(clean_dir.iterdir()):
         with st.spinner("Initializing data for the first time... This may take a minute."):

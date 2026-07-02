@@ -50,12 +50,20 @@ def _compute_single_fund_signals(
 
         # 1) Monthly nav series (month-end) and simple 1/3/6M returns
         
-    monthly_nav = (
-        df.set_index("date")["nav"]
-        .resample("M")
-        .last()
-        .dropna()
-    )
+    try:
+        monthly_nav = (
+            df.set_index("date")["nav"]
+            .resample("ME")
+            .last()
+            .dropna()
+        )
+    except ValueError:
+        monthly_nav = (
+            df.set_index("date")["nav"]
+            .resample("M")
+            .last()
+            .dropna()
+        )
 
     monthly_df = monthly_nav.to_frame(name="nav").reset_index()  # columns: ['date', 'nav']
 

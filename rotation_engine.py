@@ -366,9 +366,15 @@ def run_rotation_sip_strategy(
     )
     # 'signals_df' columns: ['fund_name','date','nav','R1','R3','R6','VOL6','DD6']
 
-    sip_months = sorted(signals_df["date"].unique().tolist())
+    # Use explicit date range to match other strategies exactly
+    # (signals_df might include a partial last month via resample, which date_range excludes)
+    try:
+        sip_months = pd.date_range(start=start_date, end=end_date, freq="ME").to_pydatetime().tolist()
+    except ValueError:
+        sip_months = pd.date_range(start=start_date, end=end_date, freq="M").to_pydatetime().tolist()
+    
     if not sip_months:
-        raise ValueError("No monthly signals available within the selected window.")
+        raise ValueError("No SIP dates generated for the selected window.")
 
     
     # 3) Prepare daily index and structures for units per fund
@@ -602,6 +608,13 @@ def run_rotation_sip_strategy_v2_buy_the_dip(
         end_date = pd.to_datetime(end_date)
 
     # SIP schedule: monthly
+    if frequency in ("M", "ME"):
+        try:
+            pd.date_range(start="2020-01-01", end="2020-01-31", freq="ME")
+            frequency = "ME"
+        except ValueError:
+            frequency = "M"
+
     sip_dates = pd.date_range(start=start_date, end=end_date, freq=frequency).to_pydatetime().tolist()
     if not sip_dates:
         raise ValueError("No SIP dates generated for the given period.")
@@ -830,7 +843,10 @@ def run_equal_weight_sip_strategy(
     if end_date is None: end_date = all_dates.max()
     else: end_date = pd.to_datetime(end_date)
     
-    sip_dates = pd.date_range(start=start_date, end=end_date, freq="M").to_pydatetime().tolist()
+    try:
+        sip_dates = pd.date_range(start=start_date, end=end_date, freq="ME").to_pydatetime().tolist()
+    except ValueError:
+        sip_dates = pd.date_range(start=start_date, end=end_date, freq="M").to_pydatetime().tolist()
     
     units_held = {name: pd.Series(0.0, index=combined_nav.index) for name in fund_names}
     cashflows = []
@@ -920,12 +936,31 @@ def compare_rotation_vs_baseline(
     start_date: Optional[pd.Timestamp],
     end_date: Optional[pd.Timestamp],
 ):
+    # 0. Determine common date range across ALL funds (baseline + rotation)
+    all_funds_to_check = list(set(rotation_funds + [baseline_fund]))
+    combined_nav = _load_multi_fund_nav(all_funds_to_check, start_date=start_date, end_date=end_date)
+    
+    if combined_nav.empty:
+        raise ValueError("No common data found for the selected funds.")
+        
+    # Drop rows where ANY fund is NaN to find true common history
+    # (Or we can just take the min/max of the index if _load_multi_fund_nav already aligns them)
+    # _load_multi_fund_nav returns an outer join by default, so we need to find the range where all exist.
+    # Actually, let's just find the first and last date where ALL funds have valid data.
+    valid_mask = combined_nav.notna().all(axis=1)
+    if not valid_mask.any():
+         raise ValueError("No common dates where all funds have data.")
+         
+    common_dates = combined_nav.index[valid_mask]
+    common_start = common_dates.min()
+    common_end = common_dates.max()
+    
     # 1. Baseline
     baseline_res = run_baseline_sip_strategy(
         fund_name=baseline_fund,
         sip_amount=sip_amount,
-        start_date=start_date,
-        end_date=end_date,
+        start_date=common_start,
+        end_date=common_end,
         risk_free_rate=risk_free_rate,
     )
     baseline_res.name = f"Baseline SIP in {baseline_fund}"
@@ -934,8 +969,8 @@ def compare_rotation_vs_baseline(
     normal_res = run_equal_weight_sip_strategy(
         fund_names=rotation_funds,
         sip_amount=sip_amount,
-        start_date=start_date,
-        end_date=end_date,
+        start_date=common_start,
+        end_date=common_end,
         risk_free_rate=risk_free_rate,
     )
     
@@ -943,8 +978,8 @@ def compare_rotation_vs_baseline(
     rotation_res = run_rotation_sip_strategy(
         fund_names=rotation_funds,
         sip_amount=sip_amount,
-        start_date=start_date,
-        end_date=end_date,
+        start_date=common_start,
+        end_date=common_end,
         lambda_vol=lambda_vol,
         lambda_dd=lambda_dd,
         benchmark_name=benchmark_name,
@@ -956,8 +991,8 @@ def compare_rotation_vs_baseline(
         fund_names=rotation_funds,
         sip_amount=sip_amount,
         frequency="M",
-        start_date=start_date,
-        end_date=end_date,
+        start_date=common_start,
+        end_date=common_end,
         risk_free_rate=risk_free_rate,
         max_weight_per_fund=0.65,
     )
